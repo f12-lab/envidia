@@ -1,6 +1,6 @@
 = Envidia
 :author: Manuel L. Quero
-:revdate: 2025-
+:revdate: 2025-04-20
 :toc: left
 :doctype: book
 
