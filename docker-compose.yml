@@ -1,0 +1,45 @@
+services:
+  apache:
+    image: apache:latest
+    container_name: apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ftp-data:/var/www/dante.172.35.0.2.nip.io/
+    depends_on:
+      - ftp
+    networks:
+      default:
+        ipv4_address: 172.35.0.2
+
+  ftp:
+    image: ftp:latest
+    container_name: ftp
+    ports:
+      - "20:20"
+      - "2121:2121"
+      - "30000-30010:30000-30010"
+    volumes:
+      - ftp-data:/home/ftpuser/ftp
+    networks:
+      default:
+        ipv4_address: 172.35.0.3
+
+  ssh:
+    image: ssh:latest
+    container_name: ssh
+    ports:
+      - "22:22"
+    networks:
+      default:
+        ipv4_address: 172.35.0.4
+
+volumes:
+  ftp-data:
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.35.0.0/16

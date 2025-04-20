@@ -1,0 +1,22 @@
+FROM debian:bookworm
+
+RUN apt update && apt install -y vsftpd openssl
+
+# Crear usuario
+RUN useradd -m ftpuser && echo "ftpuser:ftp123" | chpasswd
+
+RUN mkdir -p /var/empty
+
+# Crear carpeta enjaulada
+RUN mkdir -p /home/ftpuser/ftp 
+
+COPY ftpFiles/vsftpd.conf /etc/vsftpd.conf
+COPY ftpFiles/certs/ssl-cert-dante.pem /etc/ssl/certs/ssl-cert-dante.pem
+COPY ftpFiles/certs/ssl-cert-dante.key /etc/ssl/private/ssl-cert-dante.key
+
+EXPOSE 20 2121 30000-30009
+
+COPY entrypointFtp.sh /entrypointFtp.sh
+RUN chmod +x /entrypointFtp.sh
+
+CMD ["/entrypointFtp.sh"]

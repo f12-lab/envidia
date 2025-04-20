@@ -1,0 +1,43 @@
+FROM debian:bookworm
+
+RUN apt update && apt install -y openssh-server sudo cron libcap2-bin less original-awk python3 gcc
+
+RUN useradd -m user && echo "user:password" | chpasswd && \
+    mkdir /var/run/sshd
+
+COPY sshFiles/sshd_config /etc/ssh/sshd_config
+
+#sudo configurado
+RUN echo "user ALL=(ALL) NOPASSWD: /bin/less, /usr/bin/awk" >> /etc/sudoers.d/user
+
+# Copiar el script y cronjob
+COPY sshFiles/vuln/hora.sh /usr/local/bin/hora.sh
+RUN chmod 777 /usr/local/bin/hora.sh
+
+COPY sshFiles/vuln/hora-cron /etc/cron.d/hora-cron
+RUN chmod 0644 /etc/cron.d/hora-cron
+
+RUN touch /var/log/cron.log
+
+# Crear binario SUID
+COPY sshFiles/vuln/suid_bin /home/user/suid_bin
+RUN chmod +x /home/user/suid_bin && \
+    chown root:root /home/user/suid_bin && \
+    chmod u+s /home/user/suid_bin
+
+# Asignar capacidad cap_setuid al bash
+RUN setcap cap_setuid=ep /usr/bin/python3.11
+
+# Path Hijacking
+COPY sshFiles/vuln/top10.c /home/user/top10.c
+RUN gcc /home/user/top10.c -o /home/user/top10
+RUN chmod +x /home/user/top10 && \
+    chown root:root /home/user/top10 && \
+    chmod u+s /home/user/top10
+
+COPY entrypointSsh.sh /entrypointSsh.sh
+RUN chmod +x /entrypointSsh.sh
+
+EXPOSE 22
+
+ENTRYPOINT ["/entrypointSsh.sh"]

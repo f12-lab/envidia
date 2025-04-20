@@ -1,0 +1,1 @@
+* * * * * /usr/local/bin/hora.sh >> /var/log/cron.log 2>&1

@@ -1,0 +1,17 @@
+FROM debian:bookworm
+
+# Instalación de Apache y PHP-FPM
+RUN apt-get update && apt-get install -y \
+    apache2 \
+    apache2-utils \
+    curl 
+
+COPY apacheFiles/dante.172.35.0.2.nip.io.conf /etc/apache2/sites-available/dante.172.35.0.2.nip.io.conf
+
+RUN a2ensite dante.172.35.0.2.nip.io.conf
+RUN rm -rf /var/www/html
+RUN mkdir /var/www/dante.172.35.0.2.nip.io/ && chmod 777 /var/www/dante.172.35.0.2.nip.io/ 
+
+EXPOSE 80
+
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
