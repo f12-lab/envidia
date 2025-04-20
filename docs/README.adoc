@@ -4,6 +4,8 @@
 :toc: left
 :doctype: book
 
+<<<
+
 == Escalada de privilegios
 
 La escalada de privilegios es el uso de una falla de software, una vulnerabilidad, un defecto de diseño, una falla de configuración o un control de acceso en un sistema operativo o aplicación para obtener acceso no autorizado a recursos que normalmente están restringidos para una aplicación o usuario.
@@ -77,6 +79,8 @@ El PATH Hijacking se produce cuando un script que se ejecuta con privilegios ele
 *NFS* permite compartir directorios y archivos entre sistemas a través de una red. Sin embargo, una configuración incorrecta puede introducir vulnerabilidades críticas que faciliten la escalada de privilegios.
 
 La opción *no_root_squash* en la configuración de NFS permite que el usuario root en el cliente mantenga privilegios de root en el servidor al acceder a los recursos compartidos. Esto puede ser explotado por un atacante para crear archivos con permisos SUID en el servidor, facilitando la obtención de una shell con privilegios elevados. Por defecto, NFS utiliza root_squash para mapear al usuario root del cliente a un usuario anónimo sin privilegios, como nfsnobody, mitigando este riesgo.
+
+<<<
 
 == Solucionar la máquina
 
@@ -352,6 +356,8 @@ image::assets/path/root.png[escalar root]
 ==== Aclaración
 
 Cómo hemos visto en este último, el código del programa estaba en C, si hubiese estado en Python o Bash, no hubiese funcionado el PATH hijacking. Esto es porque el bit SUID solo funciona con binarios compilados (como los hechos en C) porque el sistema los ejecuta directamente y respeta el privilegio del propietario (por ejemplo, root). En cambio, los scripts como Bash o Python son interpretados, y el sistema lanza el intérprete (no el script) sin aplicar el SUID, por seguridad. Así se evita que scripts fácilmente modificables obtengan privilegios elevados.
+
+<<<
 
 == ¿Cómo prevenir?
 
