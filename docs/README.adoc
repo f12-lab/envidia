@@ -42,7 +42,7 @@ Nosostros nos vamos a centrar en la escalada de privilegios vertical.
 
 El archivo Sudoers es el archivo en el que se almacenan los usuarios y grupos que tienen privilegios root para ejecutar algunas o todas las órdenes como root o otro usuario, este archivo se encuentra en /etc. La sintaxis es la siguiente para el permiso root por defecto *"root ALL = (ALL: ALL) ALL"*, aunque también hay una opción TAG disponible que es opcional.
 
-image::assets/Sintaxis.png[Sintaxis sudoers,align=center]
+image::assets/Sintaxis.png[Sintaxis sudoers,width=500,align=center]
 
 Por lo que en este archivo se puede dar privilegios root a los comandos binarios, poniendo en la configuración el binario en concreto *"NOPASSWD : /usr/bin/find"* este tipo de autorización lleva a una elevación de privilegios para acceder a root, además la etiqueta NOPASSWD significa que no se pedirá ninguna contraseña para la autenticación al ejecutar el comando sudo -l.
 
@@ -84,7 +84,7 @@ Los valores de las capabilites son:
 
 Las capabilities permiten dividir los privilegios de root en partes más pequeñas, otorgando solo los permisos necesarios. Esto mejora la seguridad, ya que los procesos reciben solo lo que necesitan para ejecutar tareas específicas. Pero si una capability se asigna a un binario de manera inapropiada, puede permitir a los usuarios ejecutar acciones que deberían estar restringidas.
 
-image::assets/Capabilities.png[Capabilities,align=center]
+image::assets/Capabilities.png[Capabilities,width=500,align=center]
 
 ==== 5. PATH Hijacking
 
@@ -119,7 +119,7 @@ $ ssh user@172.35.0.4 -p 22
 
 Si nos sale un error ponemos el comando que nos indica:
 
-image::assets/SSHerror.png[SSHerror,align=center]
+image::assets/SSHerror.png[SSHerror,width=320,align=center]
 
 === 1. Archivo sudoers
 
@@ -134,7 +134,7 @@ $ sudo -l
 
 * *-l* -> Lista los comandos específicos a los que el usuario tiene privilegios.
 
-image::assets/sudoers/sudoL.png[comando sudo -l,align=center]
+image::assets/sudoers/sudoL.png[comando sudo -l,width=500,align=center]
 
 ==== Escalada
 
@@ -152,9 +152,9 @@ $ sudo less /etc/profile
 $ !/bin/sh
 ----
 
-image::assets/sudoers/less1.png[less,align=center]
+image::assets/sudoers/less1.png[less,width=320,align=center]
 
-image::assets/sudoers/less2.png[escalar con less,align=center]
+image::assets/sudoers/less2.png[escalar con less,width=160,align=center]
 
 ===== awk 
 
@@ -165,7 +165,7 @@ Hacemos el mismo proceso anterior, buscando en GTFOBins -> https://gtfobins.gith
 $ sudo awk 'BEGIN {system("/bin/sh")}'
 ----
 
-image::assets/sudoers/awk.png[awk,align=center]
+image::assets/sudoers/awk.png[awk,width=240,align=center]
 
 De esta forma podemos escalar de privilegios si tenemos permisos de root en algunos comandos.
 
@@ -180,19 +180,21 @@ Primeramente vamos a buscar los binarios SUID que hay en el sistema:
 $ find / -perm -4000 -type f 2>/dev/null
 ----
 
-image::assets/suid/reconfind.png[reconocimeineto,align=center]
+image::assets/suid/reconfind.png[reconocimeineto,width=240,align=center]
 
 Podemos ver que hay una ruta que es distinta a todas las otras, podemos ver su código para entender mejor que ocurre si lo ejecutamos.
 
-image::assets/suid/codigo.png[ver codigo,align=center]
+image::assets/suid/codigo.png[ver codigo,width=200,align=center]
 
 ==== Escalada
 
 Es un código escrito en python3 que inicia una shell, cómo tiene el bit SUID, abrerá dicha shell como root. Por lo que nos disponemos a ejecutarlo:
 
-image::assets/suid/root.png[escalar root,align=center]
+image::assets/suid/root.png[escalar root,width=200,align=center]
 
 Y cómo podemos ver somos root, esto es muy útil conocerlo, ya que si un servicio con privilegios de root le diese el bit SUID a un archivo, este se ejecutaría con permisos de root, lo cual lo vamos a ver en el siguiente vector.
+
+<<<
 
 === 3. Cron ejecutando script editable
 
@@ -205,7 +207,7 @@ Para este caso, deberemos comprobar primeramente qué se está ejecutando con cr
 $ cat /etc/crontab
 ----
 
-image::assets/cronjob/cronjob.png[cronjob,align=center]
+image::assets/cronjob/cronjob.png[cronjob,width=540,align=center]
 
 En este caso, no aparece ningún archivo que se esté ejecutando, por lo que miramos en otras rutas:
 
@@ -214,15 +216,15 @@ En este caso, no aparece ningún archivo que se esté ejecutando, por lo que mir
 $ ls -l /etc/cron*
 ----
 
-image::assets/cronjob/cronlist.png[lista cron,align=center]
+image::assets/cronjob/cronlist.png[lista cron,width=340,align=center]
 
 Podemos ver que hay uno que se ha ejecutado recientemente, y podemos leerlo, posiblemente tenga la ruta del script que ejecute:
 
-image::assets/cronjob/horacron.png[hora cron,align=center]
+image::assets/cronjob/horacron.png[hora cron,width=440,align=center]
 
 El contenido nos muestra que cada minuto ejecuta ese script y lo almacena en un log, por lo que podemos ver los logs:
 
-image::assets/cronjob/horalogs.png[logs,align=center]
+image::assets/cronjob/horalogs.png[logs,width=200,align=center]
 
 Por lo que este script da la hora cada minuto, entonces vamos a ver sus permisos y si podemos editarlo:
 
@@ -231,7 +233,7 @@ Por lo que este script da la hora cada minuto, entonces vamos a ver sus permisos
 $ ls -la /usr/local/bin/hora.sh
 ----
 
-image::assets/cronjob/hora1.png[hora,align=center]
+image::assets/cronjob/hora1.png[hora,width=480,align=center]
 
 ==== Escalada
 
@@ -273,6 +275,8 @@ $ dpkg -l
 
 image::assets/capabilities/dpkg.png[dpkg,align=center]
 
+<<<
+
 Cómo tiene python podemos hacer un sleep con este para ver el número de proceso es y ver sus capabilities:
 
 [source,bash]
@@ -284,7 +288,7 @@ image::assets/capabilities/psaux.png[psaux,align=center]
 
 Podemos ver que su PID es el 1022, para encontrar las capabilities podemos verlo en /proc, donde habrá varios números los cuales son los IDs de los procesos:
 
-image::assets/capabilities/pid.png[pid,align=center]
+image::assets/capabilities/pid.png[pid,width=240,align=center]
 
 Para ver que capabilities tiene ese proceso ponemos el siguiente comando:
 
@@ -293,7 +297,7 @@ Para ver que capabilities tiene ese proceso ponemos el siguiente comando:
 $ cat /proc/(PID)/status | grep Cap
 ----
 
-image::assets/capabilities/cap.png[capabilities,align=center]
+image::assets/capabilities/cap.png[capabilities,width=240,align=center]
 
 Estos nos aparecerán en hexadecimal, para entenderlo podemos usar *capsh*, el cual podemos instalar en nuestro sistema y decodificar cada hexadecimal. En este caso solo tenemos tres números, pero antes de esto debemos entender las lineas:
 
@@ -321,7 +325,7 @@ Por lo que si nos vamos a GTFOBins y en la parte de Capabilities -> https://gtfo
 python3 -c 'import os; os.setuid(0); os.system("/bin/sh")'
 ----
 
-image::assets/capabilities/root.png[escalada root,align=center]
+image::assets/capabilities/root.png[escalada root,width=400,align=center]
 
 Ajustando un poco el comando a python3 podremos escalar como root.
 
@@ -331,25 +335,25 @@ Ajustando un poco el comando a python3 podremos escalar como root.
 
 Primeramente podemos ver nuestro /home si hay algún script que utilice algún comando normal, como ls, head, etc. En nuestro caso tenemos uno que se llama top10.py, si lo inspeccionamos muestra los 10 primeros usuarios y tiene permisos de root ya que tiene el bit SUID:
 
-image::assets/path/ejecucion.png[ejecucion top10,align=center]
+image::assets/path/ejecucion.png[ejecucion top10,width=280,align=center]
 
-image::assets/path/Top10.png[Top10,align=center]
+image::assets/path/Top10.png[Top10,width=280,align=center]
 
 Cómo ejecuta head como root, debe de obtener su función de $PATH:
 
-image::assets/path/path.png[echo $path,align=center]
+image::assets/path/path.png[echo $path,width=380,align=center]
 
 ==== Escalada
 
 Por lo que nosotros vamos a cambiar el path para que primero mire donde estamos y crearemos un script que nos de una shell como root.
 
-image::assets/path/cambiarpath.png[cambiar path,align=center]
+image::assets/path/cambiarpath.png[cambiar path,width=400,align=center]
 
-image::assets/path/head.png[crear head,align=center]
+image::assets/path/head.png[crear head,width=400,align=center]
 
 Una vez hecho ejecutamos el programa:
 
-image::assets/path/root.png[escalar root,align=center]
+image::assets/path/root.png[escalar root,width=200,align=center]
 
 ==== Aclaración
 
