@@ -30,13 +30,13 @@ Como resultado, la aplicación o el usuario obtienen más privilegios de los que
 
 === Tipos de escalada
 
-. *Escalada de privilegios vertical* -> El atacante comienza con una cuenta de bajo nivel (por ejemplo, un usuario estándar) y busca elevar sus privilegios para obtener acceso administrativo (como root en Linux o administrador en Windows). El objetivos comunes es acceder a datos sensibles, instalar malware, ejecutar comandos como administrador.
+. *Escalada de privilegios vertical* -> El atacante comienza con una cuenta de bajo nivel (por ejemplo, un usuario estándar) y busca elevar sus privilegios para obtener acceso administrativo (como root en Linux o administrador en Windows). El objetivo común es acceder a datos sensibles, instalar malware, ejecutar comandos como administrador.
 
 . *Escalada de privilegios horizontal* -> El atacante ya posee una cuenta privilegiada, pero intenta acceder a recursos o funciones que están fuera del alcance original de ese usuario. En aplicaciones web implica acceder a cuentas de otros usuarios, como acceder al panel de administrador desde una cuenta normal.
 
 === Vectores de ataque
 
-Nosostros nos vamos a centrar en la escalada de privilegios vertical.
+Nosotros nos vamos a centrar en la escalada de privilegios vertical.
 
 ==== 1. Archivo sudoers
 
@@ -54,7 +54,7 @@ Sin embargo, si el binario con el bit SUID activado es vulnerable, un atacante p
 
 ==== 3. Cron ejecutando script editable
 
-Primeramente debemos entender crontab, hay dos tipos:
+Primeramente, debemos entender crontab, hay dos tipos:
 
 * *Crontab del sistema* -> Se encuentra en */etc/crontab*, principalmente sirve para programar tareas a nivel global (para todos los usuarios). Además, puede contener scripts que se ejecutan con privilegios elevados.
 
@@ -100,7 +100,7 @@ La opción *no_root_squash* en la configuración de NFS permite que el usuario r
 
 En esta guía nos centraremos en la escalada de privilegios vertical, aprendiendo cómo elevar los privilegios desde un usuario estándar en distintos contextos. En esta máquina, simularemos que ya hemos obtenido las credenciales de un usuario. Es importante mencionar que existen muchas técnicas para escalar privilegios, pero aquí veremos las más comunes.
 
-Además, a lo largo de esta máquina veremos vulnerabilidades de binarios asi que recomiendo este repositorio: https://gtfobins.github.io/[GTFOBins]
+Además, a lo largo de esta máquina veremos vulnerabilidades de binarios así que recomiendo este repositorio: https://gtfobins.github.io/[GTFOBins]
 
 Debemos tener en cuenta que hay tres servicios activos:
 
@@ -142,7 +142,7 @@ Cómo podemos ver tenemos permisos en los binarios de less y awk. No necesitamos
 
 ===== less
 
-Buscnado en GTFOBins, en la sección de *Sudo* encontraremos cómo vulnerarlo -> https://gtfobins.github.io/gtfobins/less/[GTFOBins less]
+Buscando en GTFOBins, en la sección de *Sudo* encontraremos cómo vulnerarlo -> https://gtfobins.github.io/gtfobins/less/[GTFOBins less]
 
 Entonces, como este comando usa root, lo que necesitaremos es crear una shell dentro de él, entonces los comandos que ejecute esa shell serán de administrador y habremos escalado:
 
@@ -173,7 +173,7 @@ De esta forma podemos escalar de privilegios si tenemos permisos de root en algu
 
 ==== Reconocimiento
 
-Primeramente vamos a buscar los binarios SUID que hay en el sistema:
+Primeramente, vamos a buscar los binarios SUID que hay en el sistema:
 
 [source,bash]
 ----
@@ -188,11 +188,11 @@ image::assets/suid/codigo.png[ver codigo,width=200,align=center]
 
 ==== Escalada
 
-Es un código escrito en python3 que inicia una shell, cómo tiene el bit SUID, abrerá dicha shell como root. Por lo que nos disponemos a ejecutarlo:
+Es un código escrito en python3 que inicia una shell, cómo tiene el bit SUID, abrirá dicha shell como root. Por lo que nos disponemos a ejecutarlo:
 
 image::assets/suid/root.png[escalar root,width=200,align=center]
 
-Y cómo podemos ver somos root, esto es muy útil conocerlo, ya que si un servicio con privilegios de root le diese el bit SUID a un archivo, este se ejecutaría con permisos de root, lo cual lo vamos a ver en el siguiente vector.
+Y cómo podemos ver somos root, esto es muy útil conocerlo, ya que, si un servicio con privilegios de root le diese el bit SUID a un archivo, este se ejecutaría con permisos de root, lo cual lo vamos a ver en el siguiente vector.
 
 <<<
 
@@ -237,7 +237,7 @@ image::assets/cronjob/hora1.png[hora,width=480,align=center]
 
 ==== Escalada
 
-Cómo tiene permisos de escritura para otros, podemos editarlo y sobrescribir en el archivo. Asi que vamos a ejecutar una shell como root creando en /tmp el archivo rootbash:
+Cómo tiene permisos de escritura para otros, podemos editarlo y sobrescribir en el archivo. Así que vamos a ejecutar una shell como root creando en /tmp el archivo rootbash:
 
 [source,bash]
 ----
@@ -299,7 +299,7 @@ $ cat /proc/(PID)/status | grep Cap
 
 image::assets/capabilities/cap.png[capabilities,width=240,align=center]
 
-Estos nos aparecerán en hexadecimal, para entenderlo podemos usar *capsh*, el cual podemos instalar en nuestro sistema y decodificar cada hexadecimal. En este caso solo tenemos tres números, pero antes de esto debemos entender las lineas:
+Estos nos aparecerán en hexadecimal, para entenderlo podemos usar *capsh*, el cual podemos instalar en nuestro sistema y decodificar cada hexadecimal. En este caso solo tenemos tres números, pero antes de esto debemos entender las líneas:
 
 [source,bash]
 ----
@@ -333,7 +333,7 @@ Ajustando un poco el comando a python3 podremos escalar como root.
 
 ==== Reconocimiento:
 
-Primeramente podemos ver nuestro /home si hay algún script que utilice algún comando normal, como ls, head, etc. En nuestro caso tenemos uno que se llama top10.py, si lo inspeccionamos muestra los 10 primeros usuarios y tiene permisos de root ya que tiene el bit SUID:
+Primeramente, podemos ver nuestro /home si hay algún script que utilice algún comando normal, como ls, head, etc. En nuestro caso tenemos uno que se llama *top10*, si lo inspeccionamos muestra los 10 primeros usuarios y tiene permisos de root ya que tiene el bit SUID:
 
 image::assets/path/ejecucion.png[ejecucion top10,width=280,align=center]
 
@@ -345,7 +345,7 @@ image::assets/path/path.png[echo $path,width=380,align=center]
 
 ==== Escalada
 
-Por lo que nosotros vamos a cambiar el path para que primero mire donde estamos y crearemos un script que nos de una shell como root.
+Por lo que nosotros vamos a cambiar el path para que primero mire donde estamos y crearemos un script que nos dé una shell como root.
 
 image::assets/path/cambiarpath.png[cambiar path,width=400,align=center]
 
@@ -391,7 +391,7 @@ $ find / -perm -4000 -o -perm -2000 -type f 2>/dev/null
 
 * *Aplicar el principio de privilegio mínimo* -> Evitar que usuarios no administradores tengan acceso a binarios sensibles.
 
-* *Habilitar autenticación multifactor y segmentación de red para minimizar impacto en caso de explotación.*
+* *Habilitar autentificación multifactor y segmentación de red para minimizar impacto en caso de explotación.*
 
 === 3. Cronjob
 
